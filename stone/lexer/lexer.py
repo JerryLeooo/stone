@@ -8,12 +8,11 @@ from stone.lexer.pattern import regex_pattern
 
 class Lexer(object):
     def __init__(self, fp):
-        self.has_more = True
         self.reader = LineNumberReader(fp)
         self.queue = Queue()
-        self.line_no = 0
-        print(regex_pattern)
         self.pattern = re.compile(regex_pattern)
+        self.has_more = True
+        self.line_no = 0
 
     def read(self):
         if self.fill_queue(0):
@@ -45,7 +44,6 @@ class Lexer(object):
         line_no = self.reader.get_line_number()
 
         pos, end_pos = 0, len(line) - 1
-        print(line[pos:end_pos])
 
         while pos < end_pos:
             matcher = self.pattern.search(line[pos:end_pos])

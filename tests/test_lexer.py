@@ -1,5 +1,6 @@
 import os
 from stone.lexer.lexer import Lexer
+from stone.lexer.token import Token
 from stone.common.reader import LineNumberReader
 
 def test_lexer():
@@ -11,9 +12,8 @@ def test_lexer():
 
         result = []
         t = lexer.read()
-        while t:
+        while t != Token.EOF:
             result.append(t)
             t = lexer.read()
 
-        assert len(result) == 17
-
+        assert len(result) == 46

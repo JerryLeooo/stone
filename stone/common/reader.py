@@ -9,7 +9,6 @@ class LineNumberReader(object):
         return self.current_line
 
     def read_line(self):
-        print("read")
         if self.current_line < self.total_lines:
             line = self.lines[self.current_line]
             self.current_line += 1
