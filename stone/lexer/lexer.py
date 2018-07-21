@@ -7,11 +7,12 @@ from stone.lexer.token import Token, IdToken, NumberToken, StrToken
 from stone.lexer.pattern import regex_pattern
 
 class Lexer(object):
-    def __init__(self, reader):
+    def __init__(self, fp):
         self.has_more = True
-        self.reader = LineNumberReader(reader)
+        self.reader = LineNumberReader(fp)
         self.queue = Queue()
         self.line_no = 0
+        print(regex_pattern)
         self.pattern = re.compile(regex_pattern)
 
     def read(self):
@@ -43,15 +44,19 @@ class Lexer(object):
 
         line_no = self.reader.get_line_number()
 
-        pos, end_pos = 0, len(line)
+        pos, end_pos = 0, len(line) - 1
+        print(line[pos:end_pos])
 
         while pos < end_pos:
             matcher = self.pattern.search(line[pos:end_pos])
-            pos += matcher.end()
             if matcher:
                 self.add_token(line_no, matcher)
             else:
-                raise ParseException("bad token at line " + line_no)
+                raise ParseException(
+                    "bad token at line %d: %s" % (line_no, line[pos: end_pos])
+                )
+
+            pos += matcher.end()
 
             self.queue.put(IdToken(line_no, Token.EOL))
 
