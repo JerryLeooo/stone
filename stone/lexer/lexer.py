@@ -2,26 +2,17 @@ import re
 from queue import Queue
 from stone.common.exc import ParseException
 from stone.common.reader import LineNumberReader
-from stone.lexer.token import Token, IdToken
+from stone.lexer.token import Token, IdToken, NumberToken, StrToken
+
+from stone.lexer.pattern import regex_pattern
 
 class Lexer(object):
-
-    regex_pattern = r'''
-    \s*(                                 # space
-    (//.*)|                              # comment
-    (\d+)                                # number
-    ("[^"]*")|                           # string
-    [A-Z_a-z][A-z_a-z0-9]*|              # identifier
-    ==|<=|>=|&&|\|\||                    # logic symbol
-    [\+\-\*/\{\}\=\|\&\[\]\(\)\<\>\;\%]  # opr symbol
-    '''
-
     def __init__(self, reader):
         self.has_more = True
         self.reader = LineNumberReader(reader)
         self.queue = Queue()
         self.line_no = 0
-        self.pattern = re.compile(self.regex_pattern)
+        self.pattern = re.compile(regex_pattern)
 
     def read(self):
         if self.fill_queue(0):
@@ -44,7 +35,7 @@ class Lexer(object):
         try:
             line = self.reader.read_line()
         except IOError as e:
-            raise ParseException(e.message, e.errors)
+            raise ParseException(str(e))
 
         if not line:
             self.has_more = False
@@ -63,3 +54,17 @@ class Lexer(object):
                 raise ParseException("bad token at line " + line_no)
 
             self.queue.put(IdToken(line_no, Token.EOL))
+
+    def add_token(self, line_no, matcher):
+        m = matcher.group(0)
+        if m:
+            if not matcher.group(2):
+                token = None
+                if matcher.group(3):
+                    token = NumberToken(line_no, int(m))
+                elif matcher.group(4):
+                    token = StrToken(line_no, m)
+                else:
+                    token = IdToken(line_no, m)
+
+                self.queue.put(token)

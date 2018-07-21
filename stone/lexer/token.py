@@ -1,8 +1,6 @@
-from ..common.exc import StoneException
+from stone.common.exc import StoneException
 
 class Token(object):
-    EOF = -1
-    EOL = "\\n"
 
     def __init__(self, line):
         self._line_number = line
@@ -24,3 +22,45 @@ class Token(object):
 
     def next(self):
         return ""
+    
+Token.EOF = Token(-1)
+Token.EOL = Token("\\n")
+
+class IdToken(Token):
+
+    def __init__(self, line_no, id):
+        super().__init__(line_no)
+        self.text = id
+
+    def is_identifier(self):
+        return True
+
+    def get_text(self):
+        return self.text
+
+class NumberToken(Token):
+
+    def __init__(self, line_no, v):
+        super().__init__(line_no)
+        self.value = v
+
+    def is_number(self):
+        return True
+
+    def get_text(self):
+        return str(self.value)
+
+    def get_number(self):
+        return self.value
+
+class StrToken(Token):
+
+    def __init__(self, line_no, string):
+        super().__init__(line_no)
+        self.literal = string
+
+    def is_string(self):
+        return True
+
+    def get_text(self):
+        return self.literal
