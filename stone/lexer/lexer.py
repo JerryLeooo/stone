@@ -9,19 +9,23 @@ from stone.lexer.pattern import regex_pattern
 class Lexer(object):
     def __init__(self, fp):
         self.reader = LineNumberReader(fp)
-        self.queue = Queue()
+        self.queue = []
         self.pattern = re.compile(regex_pattern)
         self.has_more = True
         self.line_no = 0
 
     def read(self):
         if self.fill_queue(0):
-            return self.queue.get()
-        else:
-            return Token.EOF
+            return self.queue[0]
+        return Token.EOF
+
+    def peek(self, i):
+        if self.fill_queue(i):
+            return self.queue[i]
+        return Token.EOF
 
     def fill_queue(self, i):
-        while i >= self.queue.qsize():
+        while i >= len(self.queue):
             if self.has_more:
                 self.read_line()
             else:
@@ -56,7 +60,7 @@ class Lexer(object):
 
             pos += matcher.end()
 
-            self.queue.put(IdToken(line_no, Token.EOL))
+            self.queue.append(IdToken(line_no, Token.EOL))
 
     def add_token(self, line_no, matcher):
         m = matcher.group(0)
@@ -70,4 +74,4 @@ class Lexer(object):
                 else:
                     token = IdToken(line_no, m)
 
-                self.queue.put(token)
+                self.queue.append(token)
