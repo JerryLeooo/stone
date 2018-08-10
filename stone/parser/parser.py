@@ -86,7 +86,7 @@ class IdToken(Element):
 
     def test(self, t):
         return t.is_identifier() and t.get_text() not in self.reserved
-    
+
 class NumToken(Element):
     def __init__(self, clazz):
         super(clazz)
@@ -143,7 +143,7 @@ class Precedence(object):
         self.left_assoc = left_assoc
 
 class Operators(dict):
-    
+
     LEFT = True
     RIGHT = False
 
@@ -171,7 +171,7 @@ class Expr(Element):
         l = [left, ASTLeaf(lexer.read())]
 
         right = factor.parse(lexer)
-        n = self.next_operator(lexer) 
+        n = self.next_operator(lexer)
         while n != None and self.right_is_expr(prec, n):
             right = self.do_shift(lexer, right, n.value)
             n = self.next_operator(lexer)
@@ -196,7 +196,7 @@ class Expr(Element):
         return self.factor.match(lexer)
 
 class Factory(object):
-    
+
     factory_name = 'create'
 
     def make0(self, arg):
@@ -245,7 +245,6 @@ class Factory(object):
             raise RuntimeError(e)
 
 class Parser(object):
-    
     factory_name = "create"
 
     def __init__(self, clazz, parser = None):
@@ -278,7 +277,7 @@ class Parser(object):
     def reset(self, clazz = None):
         self.elements = []
         self.factory = Factory.get_for_astlist(clazz)
-        return self     
+        return self
 
     def number(self, clazz):
         self.elements.append(NumToken(clazz))
@@ -321,7 +320,7 @@ class Parser(object):
     def repeat(self, parser):
         self.elements.append(Repeat(parser, False))
         return self
-    
+
     def expression(self, clazz, sub_exp_parser, operators):
         self.elements.append(clazz, sub_exp_parser, operators)
         return self
@@ -336,4 +335,4 @@ class Parser(object):
             self.my_or(parser, otherwise)
 
         return self
-    
+
