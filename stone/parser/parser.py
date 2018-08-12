@@ -59,7 +59,7 @@ class Repeat(Element):
     def match(self, lexer):
         return self.parser.match(lexer)
 
-class ATokn(Element):
+class AToken(Element):
     def __init__(self, clazz):
         if clazz is None:
             clazz = ASTLeaf.__class__
@@ -170,7 +170,7 @@ class Expr(Element):
     def do_shift(self, lexer, left, prec):
         l = [left, ASTLeaf(lexer.read())]
 
-        right = factor.parse(lexer)
+        right = self.factory.parse(lexer)
         n = self.next_operator(lexer)
         while n != None and self.right_is_expr(prec, n):
             right = self.do_shift(lexer, right, n.value)
@@ -211,7 +211,7 @@ class Factory(object):
     @classmethod
     def get_for_astlist(cls, clazz):
         factory = cls.get(clazz, list)
-        if f is None:
+        if factory is None:
             def make0(arg):
                 assert isinstance(arg, list)
                 if len(arg) == 1:
@@ -219,20 +219,20 @@ class Factory(object):
                 else:
                     ASTList(arg)
 
-            f = Factory()
-            f.make0 = make0
+            factory = Factory()
+            factory.make0 = make0
 
-        return f
+        return factory
 
     @classmethod
     def get(cls, clazz, arg_type):
         if not clazz:
-            return null
+            return None
 
         try:
-            method = getattr(clazz, factory_name)
+            method = getattr(clazz, cls.factory_name)
             f = Factory()
-            f.make0 = method(arg)
+            f.make0 = method(arg_type)
 
         except Exception as e:
             pass
@@ -240,7 +240,7 @@ class Factory(object):
         try:
             c = clazz.__init__ # seems should use new here
             f = Factory()
-            f.make0 = c(arg)
+            f.make0 = c(arg_type)
         except Exception as e:
             raise RuntimeError(e)
 
@@ -259,7 +259,7 @@ class Parser(object):
     def parse(self, lexer):
         results = []
         for e in self.elements:
-            e.parse(exer, results)
+            e.parse(lexer, results)
 
         return self.factory.make(results)
 
