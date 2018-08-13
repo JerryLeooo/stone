@@ -1,15 +1,15 @@
 class ASTTree(object):
     def child(self, i):
-        raise NotImplemented
+        raise NotImplementedError
 
     def num_children(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def location(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def children(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def iterator(self):
         return self.children()
@@ -58,21 +58,3 @@ class ASTList(ASTTree):
 
     def __str__(self):
         return " ".join(self.children)
-
-class NumberLiteral(ASTLeaf):
-    def value(self):
-        return self.get_token().get_number()
-
-class Name(ASTLeaf):
-    def name(self):
-        return self.get_token().get_number()
-
-class BinaryExpr(ASTList):
-    def left(self):
-        return self.child(0)
-
-    def operator(self):
-        return ASTLeaf(self.child(1)).token().get_text()
-
-    def right(self):
-        return self.child(1)

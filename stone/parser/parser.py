@@ -271,8 +271,8 @@ class Parser(object):
         return e.match(lexer)
 
     @classmethod
-    def rule(clazz = None):
-        return Parser(clazz)
+    def rule(cls, clazz = None):
+        return cls(clazz)
 
     def reset(self, clazz = None):
         self.elements = []
