@@ -1,7 +1,6 @@
 import os
 from stone.lexer.lexer import Lexer
 from stone.lexer.token import Token
-from stone.common.reader import LineNumberReader
 
 def test_lexer():
 
