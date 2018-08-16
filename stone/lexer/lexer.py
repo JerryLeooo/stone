@@ -16,7 +16,7 @@ class Lexer(object):
 
     def read(self):
         if self.fill_queue(0):
-            return self.queue[0]
+            return self.queue.pop(0)
         return Token.EOF
 
     def peek(self, i):
@@ -26,6 +26,7 @@ class Lexer(object):
 
     def fill_queue(self, i):
         while i >= len(self.queue):
+            print(len(self.queue))
             if self.has_more:
                 self.read_line()
             else:
@@ -60,7 +61,7 @@ class Lexer(object):
 
             pos += matcher.end()
 
-            self.queue.append(IdToken(line_no, Token.EOL))
+        self.queue.append(IdToken(line_no, Token.EOL))
 
     def add_token(self, line_no, matcher):
         m = matcher.group(0)
