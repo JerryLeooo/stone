@@ -1,2 +1,2 @@
 test:
-	pytest --ignore=tests/ignored
+	pytest --ignore=tests/ignored -s

@@ -26,7 +26,6 @@ class Lexer(object):
 
     def fill_queue(self, i):
         while i >= len(self.queue):
-            print(len(self.queue))
             if self.has_more:
                 self.read_line()
             else:

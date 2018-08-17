@@ -81,23 +81,16 @@ class AToken(Element):
 
 class IdToken(AToken):
     def __init__(self, clazz, r):
-        super(clazz)
         self.reserved = r if r else set()
 
     def test(self, t):
         return t.is_identifier() and t.get_text() not in self.reserved
 
 class NumToken(AToken):
-    def __init__(self, clazz):
-        super(clazz)
-
     def test(self, t):
         return t.is_number()
 
 class StrToken(AToken):
-    def __init__(self, clazz):
-        super(clazz)
-
     def test(self, t):
         return t.is_string()
 
@@ -131,9 +124,6 @@ class Leaf(Element):
         return False
 
 class Skip(Leaf):
-    def __init__(self, clazz):
-        super(clazz)
-
     def find(self, res, t):
         pass
 
@@ -280,11 +270,11 @@ class Parser(object):
         self.elements.append(StrToken(clazz))
         return self
 
-    def token(self, strings):
+    def token(self, *strings):
         self.elements.append(Leaf(strings))
         return self
 
-    def sep(self, strings):
+    def sep(self, *strings):
         self.elements.append(Skip(strings))
         return self
 
@@ -292,7 +282,7 @@ class Parser(object):
         self.elements.append(Tree(parser))
         return self
 
-    def my_or(self, parsers):
+    def my_or(self, *parsers):
         self.elements.append(OrTree(parsers))
         return self
 
@@ -310,7 +300,7 @@ class Parser(object):
         self.elements.append(Repeat(parser, False))
         return self
 
-    def expression(self, sub_exp_parser, operators):
+    def expression(self, sub_exp_parser, *operators):
         self.elements.append(Expr(None, sub_exp_parser, operators))
         return self
 
@@ -321,7 +311,7 @@ class Parser(object):
         else:
             otherwise = Parser(self)
             self.reset(None)
-            self.my_or([parser, otherwise])
+            self.my_or(parser, otherwise)
 
         return self
 

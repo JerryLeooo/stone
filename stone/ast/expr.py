@@ -1,16 +1,10 @@
 from stone.ast.tree import ASTTree, ASTList, ASTLeaf
 
 class PrimaryExpr(ASTList):
-    def __init__(self, tree):
-        super(tree)
-
     def create(self, tree):
         return tree.get(0) if tree.size() == 1 else PrimaryExpr(tree)
 
 class NegativeExpr(ASTList):
-    def __init__(self, tree):
-        super(tree)
-
     def operand(self):
         return self.child(0)
 
@@ -18,13 +12,9 @@ class NegativeExpr(ASTList):
         return "-" + self.operand()
 
 class BlockStmnt(ASTList):
-    def __init__(self, tree):
-        super(tree)
+    pass
 
 class IfStmnt(ASTList):
-    def __init__(self, tree):
-        super(tree)
-
     def condition(self):
         return self.child(0)
 
@@ -38,9 +28,6 @@ class IfStmnt(ASTList):
         return "(if " + self.condition() + " " + self.then_block() + " else " + self.else_block() + ")"
 
 class WhileStmnt(ASTList):
-    def __init__(self, tree):
-        super(tree)
-
     def condition(self):
         return self.child(0)
 
@@ -51,13 +38,9 @@ class WhileStmnt(ASTList):
         return "(while " + self.condition() + " " + self.body() + ")"
 
 class NullStmnt(ASTList):
-    def __init__(self, tree):
-        super(tree)
+    pass
 
 class StringLiteral(ASTLeaf):
-    def __init__(self, token):
-        super(token)
-
     def value(self):
         return self.token().getText()
 

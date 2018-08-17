@@ -32,8 +32,10 @@ class BasicParser(object):
             rule(WhileStmnt).sep("while").ast(self.expr).ast(self.block),
             self.simple
         )
-        self.program = rule().my_or(self.statement,
-                                 rule(NullStmnt)).sep(";", Token.EOL)
+        self.program = rule().my_or(
+            self.statement,
+             rule(NullStmnt)
+            ).sep(";", Token.EOL)
         self.init_operator()
 
     def init_operator(self):

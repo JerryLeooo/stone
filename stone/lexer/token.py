@@ -24,7 +24,12 @@ class Token(object):
         return ""
     
 Token.EOF = Token(-1)
-Token.EOL = Token("\\n")
+Token.EOF.__str__ = lambda : "-"
+
+Token.EOL = Token(0)
+Token.EOL.get_text = lambda : "\n"
+Token.EOL.__str__ = lambda : "\n"
+
 
 class IdToken(Token):
 

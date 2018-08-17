@@ -13,7 +13,6 @@ def test_lexer_read():
         assert t.get_text() == "sum"
 
         t = lexer.read()
-        print(t)
         assert t.get_text() == " =" # not right now, should do trim
 
 def test_lexer():
@@ -31,6 +30,5 @@ def test_lexer():
         while t != Token.EOF:
             result.append(t)
             t = lexer.read()
-            print(t.get_text())
 
         assert len(result) == 30
