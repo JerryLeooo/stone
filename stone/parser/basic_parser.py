@@ -7,7 +7,7 @@ rule = Parser.rule
 
 class BasicParser(object):
     def __init__(self):
-        self.reserved = set(";", "}", Token.EOL)
+        self.reserved = set([";", "}", Token.EOL])
         self.operators = Operators()
         self.expr0 = Parser.rule()
         self.primary = (rule(PrimaryExpr)

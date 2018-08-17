@@ -69,7 +69,7 @@ class AToken(Element):
         t = lexer.read()
         if self.test(t):
             leaf = self.factory.make(t)
-            res.append(t)
+            res.append(leaf)
         else:
             raise ParseException(t)
 
@@ -79,7 +79,7 @@ class AToken(Element):
     def test(self, t):
         raise NotImplementedError
 
-class IdToken(Element):
+class IdToken(AToken):
     def __init__(self, clazz, r):
         super(clazz)
         self.reserved = r if r else set()
@@ -87,7 +87,7 @@ class IdToken(Element):
     def test(self, t):
         return t.is_identifier() and t.get_text() not in self.reserved
 
-class NumToken(Element):
+class NumToken(AToken):
     def __init__(self, clazz):
         super(clazz)
 
@@ -147,9 +147,6 @@ class Operators(dict):
     LEFT = True
     RIGHT = False
 
-    def __init__(self):
-        super(dict).__init__()
-
     def add(self, name, prec, left_assoc):
         self[name] = Precedence(prec, left_assoc)
 
@@ -170,7 +167,7 @@ class Expr(Element):
     def do_shift(self, lexer, left, prec):
         l = [left, ASTLeaf(lexer.read())]
 
-        right = self.factory.parse(lexer)
+        right = self.factor.parse(lexer)
         n = self.next_operator(lexer)
         while n != None and self.right_is_expr(prec, n):
             right = self.do_shift(lexer, right, n.value)
@@ -204,7 +201,7 @@ class Factory(object):
 
     def make(self, arg):
         try:
-            self.make0(arg)
+            return self.make0(arg)
         except Exception as e:
             raise RuntimeError(e)
 
@@ -226,35 +223,26 @@ class Factory(object):
 
     @classmethod
     def get(cls, clazz, arg_type):
-        if not clazz:
-            return None
+        func = getattr(clazz, cls.factory_name, None)
 
-        try:
-            method = getattr(clazz, cls.factory_name)
-            f = Factory()
-            f.make0 = method(arg_type)
+        factory = cls()
 
-        except Exception as e:
-            pass
+        if func:
+            factory.make0 = lambda arg: func(arg)
+        else:
+            factory.make0 = lambda arg: clazz(arg)
 
-        try:
-            c = clazz.__init__ # seems should use new here
-            f = Factory()
-            f.make0 = c(arg_type)
-        except Exception as e:
-            raise RuntimeError(e)
+        return factory
 
 class Parser(object):
     factory_name = "create"
 
-    def __init__(self, clazz, parser = None):
-        self.reset(clazz)
-        self.elements = []
-        self.factory = None
-
-        if parser:
-            self.elements = parser.elements
-            self.factory = parser.factory
+    def __init__(self, arg = None):
+        if isinstance(arg, Parser):
+            self.elements = arg.elements
+            self.factory = arg.factory
+        else:
+            self.reset(arg)
 
     def parse(self, lexer):
         results = []
@@ -276,7 +264,8 @@ class Parser(object):
 
     def reset(self, clazz = None):
         self.elements = []
-        self.factory = Factory.get_for_astlist(clazz)
+        if clazz:
+            self.factory = Factory.get_for_astlist(clazz)
         return self
 
     def number(self, clazz):
@@ -303,7 +292,7 @@ class Parser(object):
         self.elements.append(Tree(parser))
         return self
 
-    def my_or(self, *parsers):
+    def my_or(self, parsers):
         self.elements.append(OrTree(parsers))
         return self
 
@@ -321,8 +310,8 @@ class Parser(object):
         self.elements.append(Repeat(parser, False))
         return self
 
-    def expression(self, clazz, sub_exp_parser, operators):
-        self.elements.append(clazz, sub_exp_parser, operators)
+    def expression(self, sub_exp_parser, operators):
+        self.elements.append(Expr(None, sub_exp_parser, operators))
         return self
 
     def insert_choice(self, parser):
@@ -332,7 +321,7 @@ class Parser(object):
         else:
             otherwise = Parser(self)
             self.reset(None)
-            self.my_or(parser, otherwise)
+            self.my_or([parser, otherwise])
 
         return self
 

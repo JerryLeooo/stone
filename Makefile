@@ -1,2 +1,2 @@
 test:
-	pytest --fulltrace --ignore=tests/ignored
+	pytest --ignore=tests/ignored
