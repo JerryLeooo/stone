@@ -4,7 +4,15 @@ from stone.common.exc import ParseException
 from stone.common.reader import LineNumberReader
 from stone.lexer.token import Token, IdToken, NumberToken, StrToken
 
-from stone.lexer.pattern import regex_pattern
+regex_pattern = (
+r'\s*(' +
+r'(//.*)|' + 
+r'(\d+)|' + 
+r'("[^"]*")|' + 
+r'[A-Z_a-z][A-z_a-z0-9]*|' + 
+r'==|<=|>=|&&|\|\||' + 
+r'[\+\-\*/\{\}\=\|\&\[\]\(\)\<\>\;\%]' + 
+r')')
 
 class Lexer(object):
     def __init__(self, fp):
@@ -24,6 +32,19 @@ class Lexer(object):
             return self.queue[i]
         return Token.EOF
 
+    def add_token(self, line_no, matcher):
+        m = matcher.group(1)
+        if m is not None:  # not a space line
+            if matcher.group(2) == None:  # not a comment
+                if matcher.group(3) != None:
+                    token = NumberToken(self.line_no, int(m))
+                elif matcher.group(4) != None:
+                    token = StrToken(self.line_no, m)
+                else:
+                    token = IdToken(self.line_no, m)
+                self.queue.append(token)
+
+
     def fill_queue(self, i):
         while i >= len(self.queue):
             if self.has_more:
@@ -32,6 +53,9 @@ class Lexer(object):
                 return False
 
         return True
+
+    def __str__(self):
+        return "<Lexer: %s %s>" % (self.pattern, self.line_no)
 
     def read_line(self):
         line = ""
@@ -55,23 +79,9 @@ class Lexer(object):
                 self.add_token(line_no, matcher)
             else:
                 raise ParseException(
-                    "bad token at line %d: %s" % (line_no, line[pos: end_pos])
+                    "bad token at line %d: %s, where line is %s, and pos=%d, end_pos=%d" % (line_no, line[pos: end_pos], line, pos, end_pos)
                 )
 
             pos += matcher.end()
 
         self.queue.append(IdToken(line_no, Token.EOL))
-
-    def add_token(self, line_no, matcher):
-        m = matcher.group(0)
-        if m:
-            if not matcher.group(2):
-                token = None
-                if matcher.group(3):
-                    token = NumberToken(line_no, int(m))
-                elif matcher.group(4):
-                    token = StrToken(line_no, m)
-                else:
-                    token = IdToken(line_no, m)
-
-                self.queue.append(token)

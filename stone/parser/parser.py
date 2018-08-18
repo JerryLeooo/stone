@@ -1,6 +1,6 @@
 # from chapter 17
 from stone.common.exc import ParseException
-from stone.ast.tree import ASTList, ASTLeaf, ASTTree
+from stone.ast.expr import ASTList, ASTLeaf, ASTTree
 from stone.lexer.token import Token
 
 class Element(object):
@@ -14,7 +14,7 @@ class Tree(Element):
         self.parser = parser
 
     def parse(self, lexer, res):
-        res.add(self.parser.parse(lexer))
+        res.append(self.parser.parse(lexer))
 
     def match(self, lexer):
         return self.parser.match(lexer)
@@ -26,7 +26,7 @@ class OrTree(Element):
     def parse(self, lexer, res):
         parser = self.choose(lexer)
         if parser is None:
-            raise ParseException(lexer.peek(0))
+            raise ParseException(lexer.peek(0).get_text())
         else:
             res.append(parser.parse(lexer))
 
@@ -74,17 +74,19 @@ class AToken(Element):
             raise ParseException(t)
 
     def match(self, lexer):
-        self.test(lexer.peek(0))
+        return self.test(lexer.peek(0))
 
     def test(self, t):
         raise NotImplementedError
 
 class IdToken(AToken):
     def __init__(self, clazz, r):
+        super().__init__(clazz)
         self.reserved = r if r else set()
 
     def test(self, t):
-        return t.is_identifier() and t.get_text() not in self.reserved
+        r = t.is_identifier() and not t.get_text() in self.reserved
+        return r
 
 class NumToken(AToken):
     def test(self, t):
@@ -107,13 +109,12 @@ class Leaf(Element):
                     return
 
         if len(self.tokens) > 0:
-            print(self.tokens)
             raise ParseException(self.tokens[0] + " expected", t)
         else:
             raise ParseException(t)
 
     def find(self, res, t):
-        res.add(ASTLeaf(t))
+        res.append(ASTLeaf(t))
 
     def match(self, lexer):
         t = lexer.peek(0)
@@ -153,7 +154,7 @@ class Expr(Element):
         while prec != None:
             right = self.do_shift(lexer, right, prec.value)
             prec = self.next_operator(lexer)
-        res.add(right)
+        res.append(right)
 
     def do_shift(self, lexer, left, prec):
         l = [left, ASTLeaf(lexer.read())]
@@ -205,7 +206,7 @@ class Factory(object):
                 if len(arg) == 1:
                     return arg[0]
                 else:
-                    ASTList(arg)
+                    return ASTList(arg)
 
             factory = Factory()
             factory.make0 = make0
@@ -214,6 +215,10 @@ class Factory(object):
 
     @classmethod
     def get(cls, clazz, arg_type):
+
+        if not clazz:
+            return None
+
         func = getattr(clazz, cls.factory_name, None)
 
         factory = cls()
@@ -226,8 +231,6 @@ class Factory(object):
         return factory
 
 class Parser(object):
-    factory_name = "create"
-
     def __init__(self, arg = None):
         if isinstance(arg, Parser):
             self.elements = arg.elements
@@ -255,8 +258,7 @@ class Parser(object):
 
     def reset(self, clazz = None):
         self.elements = []
-        if clazz:
-            self.factory = Factory.get_for_astlist(clazz)
+        self.factory = Factory.get_for_astlist(clazz)
         return self
 
     def number(self, clazz):
@@ -301,18 +303,6 @@ class Parser(object):
         self.elements.append(Repeat(parser, False))
         return self
 
-    def expression(self, sub_exp_parser, *operators):
-        self.elements.append(Expr(None, sub_exp_parser, operators))
+    def expression(self, sub_exp_parser, operators, clazz=None):
+        self.elements.append(Expr(clazz, sub_exp_parser, operators))
         return self
-
-    def insert_choice(self, parser):
-        e = self.elements[0]
-        if isinstance(e, OrTree):
-            e.insert(parser)
-        else:
-            otherwise = Parser(self)
-            self.reset(None)
-            self.my_or(parser, otherwise)
-
-        return self
-

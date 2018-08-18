@@ -2,6 +2,14 @@ import os
 from stone.lexer.lexer import Lexer
 from stone.lexer.token import Token
 
+def test_lexer_simple_read():
+    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
+
+    with open("%s/simple.stone" % pwd, "r") as fp:
+        lexer = Lexer(fp)
+
+        t = lexer.read()
+        assert t.get_text() == "sum"
 
 def test_lexer_read():
     pwd = os.path.abspath(os.path.join(__file__, os.pardir))
@@ -13,7 +21,7 @@ def test_lexer_read():
         assert t.get_text() == "sum"
 
         t = lexer.read()
-        assert t.get_text() == " =" # not right now, should do trim
+        assert t.get_text() == "=" # not right now, should do trim
 
 def test_lexer():
 
@@ -32,3 +40,6 @@ def test_lexer():
             t = lexer.read()
 
         assert len(result) == 30
+
+def test_eol():
+    assert Token.EOL == "\n"
