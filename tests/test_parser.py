@@ -10,7 +10,8 @@ def test_parser():
         lexer = Lexer(fp)
         bp = BasicParser()
         while lexer.peek(0) != Token.EOF:
+            print(lexer.peek(0).get_text())
             ast = bp.parse(lexer)
-            print("ast", ast)
+            print("ast", ast.get_token())
 
     assert False

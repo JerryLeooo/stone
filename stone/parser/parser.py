@@ -62,8 +62,8 @@ class Repeat(Element):
 class AToken(Element):
     def __init__(self, clazz):
         if clazz is None:
-            clazz = ASTLeaf.__class__
-        self.factory = Factory.get(clazz, Token.__class__)
+            clazz = ASTLeaf
+        self.factory = Factory.get(clazz, Token)
 
     def parse(self, lexer, res):
         t = lexer.read()
@@ -107,6 +107,7 @@ class Leaf(Element):
                     return
 
         if len(self.tokens) > 0:
+            print(self.tokens)
             raise ParseException(self.tokens[0] + " expected", t)
         else:
             raise ParseException(t)

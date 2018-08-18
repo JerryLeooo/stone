@@ -10,21 +10,24 @@ class BasicParser(object):
         self.reserved = set([";", "}", Token.EOL])
         self.operators = Operators()
         self.expr0 = Parser.rule()
-        self.primary = (rule(PrimaryExpr)
-                        .my_or(rule().sep("(").ast(self.expr0).sep(")"),
-                            rule().number(NumberLiteral),
-                            rule().identifier(Name, self.reserved),
-                            rule().string(StringLiteral)
-                           )
-                       )
+        self.primary = (
+            rule(PrimaryExpr).my_or(
+                rule().sep("(").ast(self.expr0).sep(")"),
+                rule().number(NumberLiteral),
+                rule().identifier(self.reserved, Name),
+                rule().string(StringLiteral)
+            )
+        )
         self.factor = rule().my_or(rule(NegativeExpr).sep("-").ast(self.primary), self.primary)
         self.expr = self.expr0.expression(BinaryExpr, self.factor, self.operators)
         self.statement0 = rule()
-        self.block = (rule(BlockStmnt).sep("{")
-                      .option(self.statement0)
-                      .repeat(rule().sep(";", Token.EOL).option(self.statement0))
-                      .sep("}")
-                     )
+        self.block = (
+            rule(BlockStmnt)
+            .sep("{")
+                .option(self.statement0)
+                .repeat(rule().sep(";", Token.EOL).option(self.statement0))
+            .sep("}")
+        )
         self.simple = rule(self.primary).ast(self.expr)
         self.statement = self.statement0.my_or(
             rule(IfStmnt).sep("if").ast(self.expr).ast(self.block)
@@ -33,9 +36,8 @@ class BasicParser(object):
             self.simple
         )
         self.program = rule().my_or(
-            self.statement,
-             rule(NullStmnt)
-            ).sep(";", Token.EOL)
+            self.statement, rule(NullStmnt)
+        ).sep(";", Token.EOL)
         self.init_operator()
 
     def init_operator(self):
