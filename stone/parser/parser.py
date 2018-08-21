@@ -107,7 +107,7 @@ class Leaf(Element):
                 if token == t.get_text():
                     self.find(res, t)
                     return
-
+        print(self.tokens)
         if len(self.tokens) > 0:
             raise ParseException(self.tokens[0] + " expected", t)
         else:

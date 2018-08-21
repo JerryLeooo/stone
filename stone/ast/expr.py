@@ -57,7 +57,7 @@ class ASTList(ASTTree):
         return None
 
     def __str__(self):
-        return " ".join(self.children)
+        return str(self._children)
 
 class PrimaryExpr(ASTList):
     
