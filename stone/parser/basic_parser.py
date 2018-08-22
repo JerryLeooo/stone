@@ -10,25 +10,28 @@ class BasicParser(object):
         self.operators = Operators()
         self.init()
 
+        self.expr0 = Parser()
         self.primary = (
             rule(PrimaryExpr).my_or(
-                Parser().sep("(").ast(Parser()).sep(")"),
+                Parser().sep("(").ast(self.expr0).sep(")"),
                 Parser().number(NumberLiteral),
                 Parser().identifier(self.reserved, Name),
                 Parser().string(StringLiteral)
             )
         )
         self.factor = Parser().my_or(rule(NegativeExpr).sep("-").ast(self.primary), self.primary)
-        self.expr = Parser().expression(self.factor, self.operators, BinaryExpr)
+        self.expr = self.expr0.expression(self.factor, self.operators, BinaryExpr)
+
+        self.statement0 = Parser()
         self.block = (
             rule(BlockStmnt)
             .sep("{")
                 .option(Parser())
-                .repeat(Parser().sep(";", Token.EOL).option(Parser()))
+                .repeat(Parser().sep(";", Token.EOL).option(self.statement0))
             .sep("}")
         )
         self.simple = rule(PrimaryExpr).ast(self.expr)
-        self.statement = Parser().my_or(
+        self.statement = self.statement0.my_or(
             rule(IfStmnt).sep("if").ast(self.expr).ast(self.block)
                 .option(Parser().sep("else").ast(self.block)),
             rule(WhileStmnt).sep("while").ast(self.expr).ast(self.block),

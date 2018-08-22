@@ -102,7 +102,7 @@ class WhileStmnt(ASTList):
     def __str__(self):
         print(self.condition())
         print(self.body())
-        return "(while " + self.condition() + " " + self.body() + ")"
+        return "(while %s {%s})" % (self.condition(), self.body())
 
 class NullStmnt(ASTList):
     pass
