@@ -14,6 +14,7 @@ r'==|<=|>=|&&|\|\||' +
 r'[\+\-\*/\{\}\=\|\&\[\]\(\)\<\>\;\%]' + 
 r')')
 
+
 class Lexer(object):
     def __init__(self, fp):
         self.reader = LineNumberReader(fp)

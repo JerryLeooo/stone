@@ -4,6 +4,12 @@ from stone.parser.basic_parser import BasicParser
 from stone.parser.parser import Parser
 from stone.lexer.token import Token
 from stone.ast.expr import Name, WhileStmnt, BlockStmnt
+
+import sys, traceback
+
+bp = BasicParser()
+pwd = os.path.abspath(os.path.join(__file__, os.pardir))
+
 '''
 def test_identifier_parse():
     bp = BasicParser()
@@ -13,54 +19,44 @@ def test_identifier_parse():
         id_result = Parser().identifier(set([";", "}", Token.EOL]), Name).parse(lexer)
         assert(id_result.name() == "sum")
 
+'''
+
+'''
 def test_primary_parse():
     bp = BasicParser()
     pwd = os.path.abspath(os.path.join(__file__, os.pardir))
     with open("%s/simple.stone" % pwd, "r") as fp:
         lexer = Lexer(fp)
-        primary_result = bp.primary.parse(lexer)
-        assert(primary_result.name() == "sum")
+        while lexer.peek(0) != Token.EOF:
+            bp.primary.parse(lexer)
+'''
 
 def test_expr_parse():
-    bp = BasicParser()
-    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
-    with open("%s/simple.stone" % pwd, "r") as fp:
+    with open("%s/expr.stone" % pwd, "r") as fp:
         lexer = Lexer(fp)
-        expr_result = bp.expr.parse(lexer)
-        print(expr_result)
+        bp.expr.parse(lexer)
 '''
+'''
+def test_simple_parse():
+    with open("%s/expr.stone" % pwd, "r") as fp:
+        lexer = Lexer(fp)
+        bp.simple.parse(lexer)
 
 '''
+'''
+def test_factor_parse():
+    with open("%s/factor.stone" % pwd, "r") as fp:
+        lexer = Lexer(fp)
+        bp.factor.parse(lexer)
+
 def test_while_parse():
-    bp = BasicParser()
-    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
     with open("%s/while.stone" % pwd, "r") as fp:
         lexer = Lexer(fp)
-        while_result = Parser.rule(WhileStmnt).sep("while").ast(bp.expr).ast(bp.block).parse(lexer)
-        print(while_result)
-'''
-
-def test_block_parse():
-    bp = BasicParser()
-    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
-    with open("%s/block.stone" % pwd, "r") as fp:
-        lexer = Lexer(fp)
-
-        parser = (Parser.rule(BlockStmnt)
-            .sep("{")
-                .option(Parser())
-                .repeat(Parser().sep(";", Token.EOL).option(Parser()))
-            .sep("}")
-        )
-
-        print("elements", parser.elements, parser)
-        
-        print("result", parser.parse(lexer))
+        while lexer.peek(0) != Token.EOF:
+            ast = bp.statement.parse(lexer)
 
 '''
 def test_parser():
-    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
-
     with open("%s/more.stone" % pwd, "r") as fp:
         lexer = Lexer(fp)
         bp = BasicParser()

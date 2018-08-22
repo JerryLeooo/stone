@@ -57,7 +57,7 @@ class ASTList(ASTTree):
         return None
 
     def __str__(self):
-        return str(self._children)
+        return "(" + " ".join([str(c) for c in list(self.children())]) + ")"
 
 class PrimaryExpr(ASTList):
     
@@ -92,7 +92,6 @@ class WhileStmnt(ASTList):
 
     def __init__(self, l):
         super().__init__(l)
-        print("while", l)
 
     def condition(self):
         return self.child(0)
@@ -101,6 +100,8 @@ class WhileStmnt(ASTList):
         return self.child(1)
 
     def __str__(self):
+        print(self.condition())
+        print(self.body())
         return "(while " + self.condition() + " " + self.body() + ")"
 
 class NullStmnt(ASTList):
@@ -129,13 +130,12 @@ class BinaryExpr(ASTList):
     
     def __init__(self, t):
         super().__init__(t)
-        print("children", t)
 
     def left(self):
         return self.child(0)
 
     def operator(self):
-        return ASTLeaf(self.child(1)).token.get_text()
+        return self.child(1).token.get_text()
 
     def right(self):
         return self.child(2)

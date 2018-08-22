@@ -85,8 +85,7 @@ class IdToken(AToken):
         self.reserved = r if r else set()
 
     def test(self, t):
-        r = t.is_identifier() and not t.get_text() in self.reserved
-        print(t.is_identifier(), t.get_text(), self.reserved, r)
+        r = t.is_identifier() and not (t.get_text() in self.reserved)
         return r
 
 class NumToken(AToken):
@@ -171,7 +170,6 @@ class Expr(Element):
 
     def next_operator(self, lexer):
         t = lexer.peek(0)
-        print(t.get_text())
         if t.is_identifier():
             return self.ops.get(t.get_text())
         else:
