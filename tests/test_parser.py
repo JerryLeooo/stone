@@ -4,7 +4,6 @@ from stone.parser.basic_parser import BasicParser
 from stone.parser.parser import Parser
 from stone.lexer.token import Token
 from stone.ast.expr import Name, WhileStmnt, BlockStmnt
-
 '''
 def test_identifier_parse():
     bp = BasicParser()
@@ -28,14 +27,17 @@ def test_expr_parse():
     with open("%s/simple.stone" % pwd, "r") as fp:
         lexer = Lexer(fp)
         expr_result = bp.expr.parse(lexer)
+        print(expr_result)
+'''
 
+'''
 def test_while_parse():
     bp = BasicParser()
     pwd = os.path.abspath(os.path.join(__file__, os.pardir))
     with open("%s/while.stone" % pwd, "r") as fp:
         lexer = Lexer(fp)
         while_result = Parser.rule(WhileStmnt).sep("while").ast(bp.expr).ast(bp.block).parse(lexer)
-
+        print(while_result)
 '''
 
 def test_block_parse():
@@ -53,7 +55,7 @@ def test_block_parse():
 
         print("elements", parser.elements, parser)
         
-        parser.parse(lexer)
+        print("result", parser.parse(lexer))
 
 '''
 def test_parser():
