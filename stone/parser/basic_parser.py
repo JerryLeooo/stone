@@ -26,7 +26,7 @@ class BasicParser(object):
         self.block = (
             rule(BlockStmnt)
             .sep("{")
-                .option(Parser())
+                .option(self.statement0)
                 .repeat(Parser().sep(";", Token.EOL).option(self.statement0))
             .sep("}")
         )
@@ -40,6 +40,7 @@ class BasicParser(object):
         self.program = Parser().my_or(
             self.statement, rule(NullStmnt)
         ).sep(";", Token.EOL)
+        
 
     def init(self):
         self.reserved.add(";")
