@@ -40,7 +40,7 @@ class ASTList(ASTTree):
         self._children = l
 
     def child(self, i):
-        self._children[i]
+        return self._children[i]
 
     def num_children(self):
         return len(self._children)
@@ -70,7 +70,7 @@ class NegativeExpr(ASTList):
         return self.child(0)
 
     def __str__(self):
-        return "-" + self.operand()
+        return "-%s" % self.operand()
 
 class BlockStmnt(ASTList):
     pass
@@ -101,8 +101,6 @@ class WhileStmnt(ASTList):
         return self.child(1)
 
     def __str__(self):
-        print(self.condition())
-        print(self.body())
         return "(while %s {%s})" % (self.condition(), self.body())
 
 class NullStmnt(ASTList):

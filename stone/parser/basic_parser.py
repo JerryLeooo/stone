@@ -19,7 +19,9 @@ class BasicParser(object):
                 Parser().string(StringLiteral)
             )
         )
-        self.factor = Parser().my_or(rule(NegativeExpr).sep("-").ast(self.primary), self.primary)
+        self.factor = Parser().my_or(
+            rule(NegativeExpr).sep("-").ast(self.primary), self.primary
+        )
         self.expr = self.expr0.expression(self.factor, self.operators, BinaryExpr)
 
         self.statement0 = Parser()
