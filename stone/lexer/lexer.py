@@ -69,19 +69,19 @@ class Lexer(object):
             self.has_more = False
             return
 
-        line_no = self.reader.get_line_number()
+        self.line_no = self.reader.get_line_number()
 
         pos, end_pos = 0, len(line) - 1
 
         while pos < end_pos:
             matcher = self.pattern.search(line[pos:end_pos])
             if matcher:
-                self.add_token(line_no, matcher)
+                self.add_token(self.line_no, matcher)
             else:
                 raise ParseException(
-                    "bad token at line %d: %s, where line is %s, and pos=%d, end_pos=%d" % (line_no, line[pos: end_pos], line, pos, end_pos)
+                    "bad token at line %d: %s, where line is %s, and pos=%d, end_pos=%d" % (self.line_no, line[pos: end_pos], line, pos, end_pos)
                 )
 
             pos += matcher.end()
 
-        self.queue.append(IdToken(line_no, Token.EOL))
+        self.queue.append(IdToken(self.line_no, Token.EOL))
