@@ -32,7 +32,7 @@ class ASTLeaf(ASTTree):
         return self.token
 
     def __str__(self):
-        return self.token.get_text()
+        return self.get_token().get_text()
 
 class ASTList(ASTTree):
 
@@ -89,6 +89,11 @@ class IfStmnt(ASTList):
         return "(if " + self.condition() + " " + self.then_block() + " else " + self.else_block() + ")"
 
 class WhileStmnt(ASTList):
+
+    def __init__(self, l):
+        super().__init__(l)
+        print("while", l)
+
     def condition(self):
         return self.child(0)
 
@@ -124,12 +129,13 @@ class BinaryExpr(ASTList):
     
     def __init__(self, t):
         super().__init__(t)
+        print("children", t)
 
     def left(self):
         return self.child(0)
 
     def operator(self):
-        return ASTLeaf(self.child(1)).token().get_text()
+        return ASTLeaf(self.child(1)).token.get_text()
 
     def right(self):
-        return self.child(1)
+        return self.child(2)

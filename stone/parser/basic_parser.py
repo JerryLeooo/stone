@@ -9,6 +9,8 @@ class BasicParser(object):
     def __init__(self):
         self.reserved = set()
         self.operators = Operators()
+        self.init()
+
         self.primary = (
             rule(PrimaryExpr).my_or(
                 Parser().sep("(").ast(Parser()).sep(")"),
@@ -36,8 +38,6 @@ class BasicParser(object):
         self.program = Parser().my_or(
             self.statement, rule(NullStmnt)
         ).sep(";", Token.EOL)
-
-        self.init()
 
     def init(self):
         self.reserved.add(";")

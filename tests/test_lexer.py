@@ -23,6 +23,21 @@ def test_lexer_read():
         t = lexer.read()
         assert t.get_text() == "=" # not right now, should do trim
 
+def test_lexer_read_block():
+    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
+
+    with open("%s/block.stone" % pwd, "r") as fp:
+        lexer = Lexer(fp)
+        t = lexer.read()
+        result = []
+
+        while t != Token.EOF:
+            result.append(t)
+            print(lexer.line_no, t.get_text())
+            t = lexer.read()
+        assert len(result) == 8 
+
+
 def test_lexer():
 
     pwd = os.path.abspath(os.path.join(__file__, os.pardir))

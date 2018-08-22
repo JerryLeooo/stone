@@ -8,9 +8,7 @@ def test_reader():
         reader = LineNumberReader(fp)
 
         reader.read_line()
-        assert reader.current_line == 1
-
-        assert reader.total_lines == 7
+        assert reader.line_no == 1
 
         line = reader.read_line()
         assert reader.get_line_number() == 2

@@ -1,17 +1,11 @@
 class LineNumberReader(object):
     def __init__(self, fp):
         self.fp = fp
-        self.current_line = 0
-        self.lines = fp.readlines()
-        self.total_lines = len(self.lines)
+        self.line_no = 0
 
     def get_line_number(self):
-        return self.current_line
+        return self.line_no
 
     def read_line(self):
-        if self.current_line < self.total_lines:
-            line = self.lines[self.current_line]
-            self.current_line += 1
-            return line
-        else:
-            return None
+        self.line_no = self.line_no + 1
+        return self.fp.readline()
