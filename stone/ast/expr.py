@@ -86,7 +86,8 @@ class IfStmnt(ASTList):
         return self.child(2) if self.num_children() > 2 else None
 
     def __str__(self):
-        return "(if " + self.condition() + " " + self.then_block() + " else " + self.else_block() + ")"
+        return "(if %s %s else %s )" % (
+            self.condition(), self.then_block(), self.else_block())
 
 class WhileStmnt(ASTList):
 

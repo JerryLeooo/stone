@@ -47,8 +47,16 @@ pwd = os.path.abspath(os.path.join(__file__, os.pardir))
 #         while lexer.peek(0) != Token.EOF:
 #             ast = bp.statement.parse(lexer)
 
-def test_parser():
+def test_more_parser():
     with open("%s/more.stone" % pwd, "r") as fp:
+        lexer = Lexer(fp)
+        bp = BasicParser()
+        while lexer.peek(0) != Token.EOF:
+            ast = bp.parse(lexer)
+            print(lexer.line_no, ast)
+
+def test_if_parser():
+    with open("%s/if.stone" % pwd, "r") as fp:
         lexer = Lexer(fp)
         bp = BasicParser()
         while lexer.peek(0) != Token.EOF:
