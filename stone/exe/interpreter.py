@@ -14,6 +14,7 @@ class BasicInterpreter(object):
         lexer = Lexer(fp)
         while lexer.peek(0) != Token.EOF:
             t = basic_parser.parse(lexer)
+            print(type(t))
             if not isinstance(t, NullStmnt):
                 print("???", t)
                 r = t.eval(env)

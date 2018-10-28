@@ -59,7 +59,7 @@ class BasicEvaluator(object):
         def eval(self, env):
             op = self.operator()
             if "=" == op:
-                right = self.left().eval(env)
+                right = self.right().eval(env)
                 return self.compute_assign(env, right)
             else:
                 left = self.left().eval(env)
@@ -109,7 +109,7 @@ class BasicEvaluator(object):
     @category(BlockStmnt)
     class BlockEx(object):
         def eval(self, env):
-            for t in self.children:
+            for t in self.children():
                 if not isinstance(t, NullStmnt):
                     result = t.eval(env)
             return result
