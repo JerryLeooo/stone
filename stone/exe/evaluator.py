@@ -1,46 +1,43 @@
 from stone.ast.expr import *
 from stone.common.exc import *
 
-class BasicEvaluator(object):
-    class ASTTreeEx(ASTTree):
-        def __init__(self, elem):
-            self.elem = elem
+def category(original_cls):
+    def _(cls):
+        for k, v in filter(
+            lambda item: not item[0].startswith("_"), cls.__dict__.items()
+        ):
+            setattr(original_cls, k, v)
+    return _
 
+class BasicEvaluator(object):
+
+    @category(ASTTree)
+    class ASTTreeEx(object):
         def eval(self, env):
             pass
 
-    class ASTListEx(ASTList): # eval ASTList
-        def __init__(self, elem):
-            self.elem = elem
-
+    @category(ASTList)
+    class ASTListEx(object): # eval ASTList
         def eval(self, env):
             raise StoneException("cannot eval: %s" % self.__str__, self)
 
-    class ASTLeafEx(ASTLeaf): # eval ASTLeaf
-        def __init__(self, elem):
-            self.elem = elem
-
+    @category(ASTLeaf)
+    class ASTLeafEx(object): # eval ASTLeaf
         def eval(self, env):
             raise StoneException("cannot eval: %s" % self.__str__, self)
 
-    class NumberEx(NUmberLiteral):
-        def __init__(self, elem):
-            self.elem = elem
-
-        def eval(self, env):
-            return self.elem.value()
-
-    class StringEx(StringLiteral):
-        def __init__(self, elem):
-            self.elem = elem
-
+    @category(NumberLiteral)
+    class NumberEx(object):
         def eval(self, env):
             return self.value()
 
-    class NameEx(Name):
-        def __init__(self, elem):
-            self.elem = elem
+    @category(StringLiteral)
+    class StringEx(object):
+        def eval(self, env):
+            return self.value()
 
+    @category(Name)
+    class NameEx(object):
         def eval(self, env):
             value = env.get(self.name())
             if value == None:
@@ -48,10 +45,8 @@ class BasicEvaluator(object):
             else:
                 return value
 
-    class NegativeEx(NegativeExpr):
-        def __init__(self, elem):
-            self.elem = elem
-
+    @category(NegativeExpr)
+    class NegativeEx(object):
         def eval(self, env):
             v = self.operand().eval(env)
             if isinstance(v, int):
@@ -59,7 +54,8 @@ class BasicEvaluator(object):
             else:
                 raise StoneException("bad type for -", self)
 
-    class BinaryEx(BinaryExpr):
+    @category(BinaryExpr)
+    class BinaryEx(object):
         def eval(self, env):
             op = self.operator()
             if "=" == op:
@@ -110,20 +106,16 @@ class BasicEvaluator(object):
             else:
                 raise StoneException("bad operator", self)
 
-    class BlockEx(BlockStmnt):
-        def __init__(self, elem):
-            self.elem = elem
-
+    @category(BlockStmnt)
+    class BlockEx(object):
         def eval(self, env):
-            for t in self:
+            for t in self.children:
                 if not isinstance(t, NullStmnt):
                     result = t.eval(env)
             return result
 
-    class IfEx(IfStmnt):
-        def __init__(self, elem):
-            self.elem = elem
-
+    @category(IfStmnt)
+    class IfEx(object):
         def eval(self, env):
             c = self.condition().eval(env)
             if isinstance(c, int) and c != 0:
@@ -135,10 +127,8 @@ class BasicEvaluator(object):
                 else:
                     return b.eval(env)
 
-    class WhileEx(WhileStmnt):
-        def __init__(self, elem):
-            self.elem = elem
-
+    @category(WhileStmnt)
+    class WhileEx(object):
         def eval(self, env):
             result = 0
             while True:

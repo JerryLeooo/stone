@@ -4,6 +4,7 @@ from stone.exe.env import BasicEnv
 from stone.lexer.lexer import Lexer
 from stone.lexer.token import Token
 from stone.ast.expr import NullStmnt
+from stone.exe.evaluator import BasicEvaluator
 
 class BasicInterpreter(object):
     def main(self, fp):
