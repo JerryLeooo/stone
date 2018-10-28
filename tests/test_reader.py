@@ -1,10 +1,9 @@
 import os
 from stone.common.reader import LineNumberReader
+from . import get_source_path
 
 def test_reader():
-    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
-
-    with open("%s/hello.stone" % pwd, "r") as fp:
+    with open(get_source_path("hello.stone"), "r") as fp:
         reader = LineNumberReader(fp)
 
         reader.read_line()

@@ -1,20 +1,17 @@
 import os
 from stone.lexer.lexer import Lexer
 from stone.lexer.token import Token
+from . import get_source_path
 
 def test_lexer_simple_read():
-    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
-
-    with open("%s/simple.stone" % pwd, "r") as fp:
+    with open(get_source_path("simple.stone"), "r") as fp:
         lexer = Lexer(fp)
 
         t = lexer.read()
         assert t.get_text() == "sum"
 
 def test_lexer_read():
-    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
-
-    with open("%s/hello.stone" % pwd, "r") as fp:
+    with open(get_source_path("hello.stone"), "r") as fp:
         lexer = Lexer(fp)
 
         t = lexer.read()
@@ -24,10 +21,7 @@ def test_lexer_read():
         assert t.get_text() == "=" # not right now, should do trim
 
 def test_lexer():
-
-    pwd = os.path.abspath(os.path.join(__file__, os.pardir))
-
-    with open("%s/hello.stone" % pwd, "r") as fp:
+    with open(get_source_path("hello.stone"), "r") as fp:
         lexer = Lexer(fp)
 
         result = []
