@@ -1,6 +1,6 @@
 import os
 
-from stone.env.interpreter import BasicInterpreter
+from stone.exe.interpreter import BasicInterpreter
 from . import get_source_path
 
 def test_interpreter():
