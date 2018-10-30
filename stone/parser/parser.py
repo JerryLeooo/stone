@@ -41,7 +41,7 @@ class OrTree(Element):
         return None
 
     def insert(self, parser):
-        self.parsers = [parser] + self.parsers
+        self.parsers = [parser] + list(self.parsers)
 
 class Repeat(Element):
     def __init__(self, parser, only_once):
@@ -238,7 +238,8 @@ class Parser(object):
         else:
             self.reset(arg)
 
-    def parse(self, lexer, results):
+    def parse(self, lexer):
+        results = []
         for e in self.elements:
             e.parse(lexer, results)
 
@@ -307,5 +308,11 @@ class Parser(object):
         return self
 
     def insert_choice(self, parser):
-        self.elements.insert(0, parser)
+        e = self.elements[0]
+        if isinstance(e, OrTree):
+            e.insert(parser)
+        else:
+            otherwise = Parser(self)
+            self.reset(None)
+            self.my_or(parser, otherwise)
         return self

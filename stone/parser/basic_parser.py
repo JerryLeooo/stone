@@ -60,8 +60,8 @@ class BasicParser(object):
         self.operators.add("/", 4, Operators.LEFT)
         self.operators.add("%", 4, Operators.LEFT)
 
-    def parse(self, lexer, results=None):
-        return self.program.parse(lexer, [] if not results else results)
+    def parse(self, lexer):
+        return self.program.parse(lexer)
 
 class FuncParser(BasicParser):
 
@@ -76,7 +76,7 @@ class FuncParser(BasicParser):
         self.define = rule(DefStmnt).sep("def").identifier(self.reserved).ast(self.param_list).ast(self.block)
         self.args = rule(Argument).ast(self.expr).repeat(rule().sep(",").ast(self.expr))
         self.postfix = rule().sep("(").maybe(self.args).sep(")")
-
+        
         self.reserved.add(")")
         self.primary.repeat(self.postfix)
         self.simple.option(self.args)

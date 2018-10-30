@@ -6,14 +6,20 @@ class Postfix(ASTList):
 
 class ParameterList(ASTList):
     def name(self, i):
-        return self.child(i).token().get_text()
+        return self.child(i).get_token().get_text()
 
     def size(self):
         return self.num_children()
 
 class DefStmnt(ASTList):
     def name(self):
-        return self.child(0).token().get_text()
+        return self.child(0).get_token().get_text()
+    
+    def parameters(self):
+        return self.child(1)
+
+    def body(self):
+        return self.child(2)
 
 class Argument(Postfix):
     def size(self):
