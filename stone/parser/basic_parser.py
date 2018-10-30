@@ -60,12 +60,13 @@ class BasicParser(object):
         self.operators.add("/", 4, Operators.LEFT)
         self.operators.add("%", 4, Operators.LEFT)
 
-    def parse(self, lexer):
-        return self.program.parse(lexer)
+    def parse(self, lexer, results=None):
+        return self.program.parse(lexer, [] if not results else results)
 
 class FuncParser(BasicParser):
 
     def __init__(self):
+        super().__init__()
         self.param = rule().identifier(self.reserved)
         self.params = rule(ParameterList).ast(self.param).repeat(
             rule().sep(",").ast(self.param)

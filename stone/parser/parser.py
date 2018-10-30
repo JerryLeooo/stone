@@ -238,8 +238,7 @@ class Parser(object):
         else:
             self.reset(arg)
 
-    def parse(self, lexer):
-        results = []
+    def parse(self, lexer, results):
         for e in self.elements:
             e.parse(lexer, results)
 
@@ -305,4 +304,8 @@ class Parser(object):
 
     def expression(self, sub_exp_parser, operators, clazz=None):
         self.elements.append(Expr(clazz, sub_exp_parser, operators))
+        return self
+
+    def insert_choice(self, parser):
+        self.elements.insert(0, parser)
         return self

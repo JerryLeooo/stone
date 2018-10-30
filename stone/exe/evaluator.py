@@ -1,10 +1,11 @@
 from stone.ast.expr import *
+from stone.ast.func import *
 from stone.common.exc import *
 
 def category(original_cls):
     def _(cls):
         for k, v in filter(
-            lambda item: not item[0].startswith("_"), cls.__dict__.items()
+            lambda item: not item[0].startswith("_") and not item[0] in original_cls.__dict__.items(), cls.__dict__.items()
         ):
             setattr(original_cls, k, v)
     return _
@@ -12,32 +13,32 @@ def category(original_cls):
 class BasicEvaluator(object):
 
     @category(ASTTree)
-    class ASTTreeEx(object):
+    class ASTTreeEx(ASTTree):
         def eval(self, env):
             pass
 
     @category(ASTList)
-    class ASTListEx(object): # eval ASTList
+    class ASTListEx(ASTList): # eval ASTList
         def eval(self, env):
             raise StoneException("cannot eval: %s" % self.__str__, self)
 
     @category(ASTLeaf)
-    class ASTLeafEx(object): # eval ASTLeaf
+    class ASTLeafEx(ASTLeaf): # eval ASTLeaf
         def eval(self, env):
             raise StoneException("cannot eval: %s" % self.__str__, self)
 
     @category(NumberLiteral)
-    class NumberEx(object):
+    class NumberEx(NumberLiteral):
         def eval(self, env):
             return self.value()
 
     @category(StringLiteral)
-    class StringEx(object):
+    class StringEx(StringLiteral):
         def eval(self, env):
             return self.value()
 
     @category(Name)
-    class NameEx(object):
+    class NameEx(Name):
         def eval(self, env):
             value = env.get(self.name())
             if value == None:
@@ -46,7 +47,7 @@ class BasicEvaluator(object):
                 return value
 
     @category(NegativeExpr)
-    class NegativeEx(object):
+    class NegativeEx(NegativeExpr):
         def eval(self, env):
             v = self.operand().eval(env)
             if isinstance(v, int):
@@ -55,7 +56,7 @@ class BasicEvaluator(object):
                 raise StoneException("bad type for -", self)
 
     @category(BinaryExpr)
-    class BinaryEx(object):
+    class BinaryEx(BinaryExpr):
         def eval(self, env):
             op = self.operator()
             if "=" == op:
@@ -107,7 +108,7 @@ class BasicEvaluator(object):
                 raise StoneException("bad operator", self)
 
     @category(BlockStmnt)
-    class BlockEx(object):
+    class BlockEx(BlockStmnt):
         def eval(self, env):
             for t in self.children():
                 if not isinstance(t, NullStmnt):
@@ -115,7 +116,7 @@ class BasicEvaluator(object):
             return result
 
     @category(IfStmnt)
-    class IfEx(object):
+    class IfEx(IfStmnt):
         def eval(self, env):
             c = self.condition().eval(env)
             if isinstance(c, int) and c != 0:
@@ -128,7 +129,7 @@ class BasicEvaluator(object):
                     return b.eval(env)
 
     @category(WhileStmnt)
-    class WhileEx(object):
+    class WhileEx(WhileStmnt):
         def eval(self, env):
             result = 0
             while True:
@@ -137,4 +138,55 @@ class BasicEvaluator(object):
                     return result
                 else:
                     self.body().eval(env)
-        
+
+class FuncEvaluator(object):
+    @category(DefStmnt)
+    class DefStmntEx(DefStmnt):
+        def eval(self, env):
+            env.put_new(self.name(), Function(self.parameters(), self.body(), env))
+            return self.name()
+
+    @category(PrimaryExpr)
+    class PrimaryEx(PrimaryExpr):
+        def operand(self):
+            return self.child(0)
+
+        def postfix(self, nest):
+            return self.child(self.num_children() - nest - 1)
+
+        def has_postfix(self, nest):
+            return self.num_children() - nest > 1
+
+        def eval(self, env):
+            return self.eval_sub_expr(env, 0)
+
+        def eval_sub_expr(self, env, nest):
+            if self.has_postfix(nest):
+                target = self.eval_sub_expr(env, nest + 1)
+                return self.postfix(nest).eval(env, target)
+            else:
+                return self.operand().eval(env)
+
+    @category(Argument)
+    class ArgumentEx(Argument):
+        def eval(self, caller_env, value):
+            if not isinstance(value, Function):
+                raise StoneException("bad function", self)
+
+            func = value
+            params = func.parameters()
+            if self.size() != params.size():
+                raise StoneException("bad number of arguments", self)
+
+            new_env = func.make_env()
+            num = 0
+            for a in self.children():
+                params.eval(new_env, num, a.eval(caller_env))
+                num += 1
+
+            return func.body().eval(new_env)
+
+    @category(ParameterList)
+    class ParamsEx(ParameterList):
+        def eval(self, env):
+            env.put_new(self.name(index), value)
