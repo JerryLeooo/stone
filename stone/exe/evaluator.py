@@ -143,7 +143,7 @@ class FuncEvaluator(object):
     @category(DefStmnt)
     class DefStmntEx(DefStmnt):
         def eval(self, env):
-            env.put_new(self.name(), Function(self.parameters(), self.body(), env))
+            env.put_new(self.name(), Function(self.parameters(), self.body, env))
             return self.name()
 
     @category(PrimaryExpr)
@@ -174,7 +174,7 @@ class FuncEvaluator(object):
                 raise StoneException("bad function", self)
 
             func = value
-            params = func.parameters()
+            params = func.parameters
             if self.size() != params.size():
                 raise StoneException("bad number of arguments", self)
 
@@ -188,5 +188,5 @@ class FuncEvaluator(object):
 
     @category(ParameterList)
     class ParamsEx(ParameterList):
-        def eval(self, env):
+        def eval(self, env, index, value):
             env.put_new(self.name(index), value)
