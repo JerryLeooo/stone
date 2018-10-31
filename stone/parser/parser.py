@@ -26,7 +26,7 @@ class OrTree(Element):
     def parse(self, lexer, res):
         parser = self.choose(lexer)
         if parser is None:
-            raise ParseException(lexer.peek(0).get_text())
+            raise ParseException(lexer.peek(0).text())
         else:
             res.append(parser.parse(lexer))
 
@@ -85,7 +85,7 @@ class IdToken(AToken):
         self.reserved = r if r else set()
 
     def test(self, t):
-        r = t.is_identifier() and not (t.get_text() in self.reserved)
+        r = t.is_identifier() and not (t.text() in self.reserved)
         return r
 
 class NumToken(AToken):
@@ -104,7 +104,7 @@ class Leaf(Element):
         t = lexer.read()
         if t.is_identifier():
             for token in self.tokens:
-                if token == t.get_text():
+                if token == t.text():
                     self.find(res, t)
                     return
 
@@ -120,7 +120,7 @@ class Leaf(Element):
         t = lexer.peek(0)
         if t.is_identifier():
             for token in self.tokens:
-                if token == t.get_text():
+                if token == t.text():
                     return True
 
         return False
@@ -171,7 +171,7 @@ class Expr(Element):
     def next_operator(self, lexer):
         t = lexer.peek(0)
         if t.is_identifier():
-            return self.ops.get(t.get_text())
+            return self.ops.get(t.text())
         else:
             return None
 

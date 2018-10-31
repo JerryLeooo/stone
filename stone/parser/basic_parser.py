@@ -1,7 +1,7 @@
 from stone.parser.parser import Parser, Operators
 from stone.ast.expr import NumberLiteral, BinaryExpr, StringLiteral, PrimaryExpr, Name, BlockStmnt, IfStmnt, WhileStmnt, NullStmnt, NegativeExpr
 from stone.lexer.token import Token
-from stone.ast.func import ParameterList, DefStmnt, Argument
+from stone.ast.func import ParameterList, DefStmnt, Argument, Fun
 
 rule = Parser.rule
 
@@ -81,3 +81,8 @@ class FuncParser(BasicParser):
         self.primary.repeat(self.postfix)
         self.simple.option(self.args)
         self.program.insert_choice(self.define)
+
+class ClosureParser(FuncParser):
+    def __init__(self):
+        super().__init__()
+        self.primary.insert_choice(rule(Fun).sep("fun").ast(self.param_list).ast(self.block))

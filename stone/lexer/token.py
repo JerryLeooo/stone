@@ -23,7 +23,7 @@ class Token(object):
     def next(self):
         return ""
     
-    def get_text(self):
+    def text(self):
         return self.__class__
     
 Token.EOF = Token(-1)
@@ -33,13 +33,13 @@ class IdToken(Token):
 
     def __init__(self, line_no, id):
         super().__init__(line_no)
-        self.text = id
+        self._text = id
 
     def is_identifier(self):
         return True
 
-    def get_text(self):
-        return self.text
+    def text(self):
+        return self._text
 
 class NumberToken(Token):
 
@@ -50,7 +50,7 @@ class NumberToken(Token):
     def is_number(self):
         return True
 
-    def get_text(self):
+    def text(self):
         return str(self.value)
 
     def get_number(self):
@@ -65,5 +65,5 @@ class StrToken(Token):
     def is_string(self):
         return True
 
-    def get_text(self):
+    def text(self):
         return self.literal

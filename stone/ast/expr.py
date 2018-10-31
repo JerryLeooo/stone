@@ -17,7 +17,7 @@ class ASTTree(object):
 class ASTLeaf(ASTTree):
 
     def __init__(self, t):
-        self.token = t
+        self._token = t
 
     def child(self, i):
         raise IndexError
@@ -26,13 +26,13 @@ class ASTLeaf(ASTTree):
         return 0
 
     def loation(self):
-        return "at line %s" % self.token.get_line_number()
+        return "at line %s" % self.token().get_line_number()
 
-    def get_token(self):
-        return self.token
+    def token(self):
+        return self._token
 
     def __str__(self):
-        return self.get_token().get_text()
+        return self.token().text()
 
 class ASTList(ASTTree):
 
@@ -108,14 +108,14 @@ class NullStmnt(ASTList):
 
 class StringLiteral(ASTLeaf):
     def value(self):
-        return self.get_token().get_text()
+        return self.token().text()
 
 class NumberLiteral(ASTLeaf):
     def __init__(self, t):
         super().__init__(t)
 
     def value(self):
-        return self.get_token().get_number()
+        return self.token().get_number()
 
 class Name(ASTLeaf):
     
@@ -123,7 +123,7 @@ class Name(ASTLeaf):
         super().__init__(t)
 
     def name(self):
-        return self.get_token().get_text()
+        return self.token().text()
 
 class BinaryExpr(ASTList):
     
@@ -134,7 +134,7 @@ class BinaryExpr(ASTList):
         return self.child(0)
 
     def operator(self):
-        return self.child(1).token.get_text()
+        return self.child(1).token().text()
 
     def right(self):
         return self.child(2)

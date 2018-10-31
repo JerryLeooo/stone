@@ -8,17 +8,17 @@ def test_lexer_simple_read():
         lexer = Lexer(fp)
 
         t = lexer.read()
-        assert t.get_text() == "sum"
+        assert t.text() == "sum"
 
 def test_lexer_read():
     with open(get_source_path("hello.stone"), "r") as fp:
         lexer = Lexer(fp)
 
         t = lexer.read()
-        assert t.get_text() == "sum"
+        assert t.text() == "sum"
 
         t = lexer.read()
-        assert t.get_text() == "=" # not right now, should do trim
+        assert t.text() == "=" # not right now, should do trim
 
 def test_lexer():
     with open(get_source_path("hello.stone"), "r") as fp:
@@ -27,7 +27,7 @@ def test_lexer():
         result = []
         t = lexer.read()
 
-        assert t.get_text() == "sum"
+        assert t.text() == "sum"
 
         while t != Token.EOF:
             result.append(t)

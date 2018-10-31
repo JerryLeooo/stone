@@ -45,7 +45,7 @@ class NestedEnv(Environment):
         if e == None:
             e = self
 
-        e.put_new(self.outer.where(name))
+        e.put_new(name, value)
 
     def where(self, name):
         if self.values.get(name) != None:
