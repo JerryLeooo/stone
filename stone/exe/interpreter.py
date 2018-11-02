@@ -17,7 +17,7 @@ class BasicInterpreter(object):
             t = parser.parse(lexer)
             if not isinstance(t, NullStmnt):
                 r = t.eval(env)
-                print("=> ", r)
+                print("=> ", t, "//", r)
 
 class FuncInterpreter(BasicInterpreter):
     def main(self, fp):

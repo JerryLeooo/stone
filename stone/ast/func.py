@@ -43,6 +43,9 @@ class Function(object):
     def parameters(self):
         return self._parameters
 
+    def __str__(self):
+        return "<function (%s)> %s" % (self.parameters(), self.body())
+
 class Fun(ASTList):
     def parameters(self):
         return self.child(0)

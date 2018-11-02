@@ -88,6 +88,7 @@ class BasicEvaluator(object):
                     raise StoneException("bad type", self)
 
         def compute_number(self, left, op, right):
+            print(left, op, right)
             if op == "+":
                 return left + right
             elif op == "-":

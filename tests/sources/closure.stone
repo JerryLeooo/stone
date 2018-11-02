@@ -1,15 +1,22 @@
-inc = fun (x) {x + 1}
+inc = fun(x) {x + 1}
 
-inc(3);
+inc(3)
 
-inc(4);
+inc(4)
 
 def counter(c) {
-    fun () { c = c + 1 }
+    fun() { c = c + 1 }
 }
 
 c1 = counter(0)
-c2 = counter(0)
+c2 = counter(0);
+
+c1
+c2
 c1()
 c1()
 c2()
+
+inc2 = fun() { 2 }
+
+inc2()
