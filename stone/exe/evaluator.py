@@ -197,7 +197,6 @@ class FuncEvaluator(object):
                 raise StoneException("bad number of arguments", self)
 
             args = []
-            num = 0
 
             for a in self.children():
                 args.append(a.eval(caller_env))

@@ -11,37 +11,37 @@ class BasicParser(object):
         self.operators = Operators()
         self.init()
 
-        self.expr0 = Parser()
+        self.expr0 = Parser(name="expr0")
         self.primary = (
-            rule(PrimaryExpr).my_or(
-                Parser().sep("(").ast(self.expr0).sep(")"),
-                Parser().number(NumberLiteral),
-                Parser().identifier(self.reserved, Name),
-                Parser().string(StringLiteral)
+            rule(PrimaryExpr, name="primary").my_or(
+                Parser(name="expr").sep("(").ast(self.expr0).sep(")"),
+                Parser(name="number").number(NumberLiteral),
+                Parser(name="identifier").identifier(self.reserved, Name),
+                Parser(name="string").string(StringLiteral)
             )
         )
-        self.factor = Parser().my_or(
-            rule(NegativeExpr).sep("-").ast(self.primary), self.primary
+        self.factor = Parser(name="NegativeExpr or primary").my_or(
+            rule(NegativeExpr, "negative").sep("-").ast(self.primary), self.primary
         )
         self.expr = self.expr0.expression(self.factor, self.operators, BinaryExpr)
 
-        self.statement0 = Parser()
+        self.statement0 = Parser(name="statement0")
         self.block = (
-            rule(BlockStmnt)
+            rule(BlockStmnt, name="BlockStmnt")
             .sep("{")
                 .option(self.statement0)
-                .repeat(Parser().sep(";", Token.EOL).option(self.statement0))
+                .repeat(Parser(name="repeat").sep(";", Token.EOL).option(self.statement0))
             .sep("}")
         )
-        self.simple = rule(PrimaryExpr).ast(self.expr)
+        self.simple = rule(PrimaryExpr, name="simple").ast(self.expr)
         self.statement = self.statement0.my_or(
-            rule(IfStmnt).sep("if").ast(self.expr).ast(self.block)
-                .option(Parser().sep("else").ast(self.block)),
-            rule(WhileStmnt).sep("while").ast(self.expr).ast(self.block),
+            rule(IfStmnt, name="if").sep("if").ast(self.expr).ast(self.block)
+                .option(Parser(name="else").sep("else").ast(self.block)),
+            rule(WhileStmnt, name="while").sep("while").ast(self.expr).ast(self.block),
             self.simple
         )
-        self.program = Parser().my_or(
-            self.statement, rule(NullStmnt)
+        self.program = Parser(name="program").my_or(
+            self.statement, rule(NullStmnt, name="null statement")
         ).sep(";", Token.EOL)
         
 
@@ -67,15 +67,15 @@ class FuncParser(BasicParser):
 
     def __init__(self):
         super().__init__()
-        self.param = rule().identifier(self.reserved)
-        self.params = rule(ParameterList).ast(self.param).repeat(
-            rule().sep(",").ast(self.param)
+        self.param = Parser(name="param").identifier(self.reserved)
+        self.params = rule(ParameterList, name="params").ast(self.param).repeat(
+            rule(name="param??").sep(",").ast(self.param)
         )
 
-        self.param_list = rule().sep("(").maybe(self.params).sep(")")
-        self.define = rule(DefStmnt).sep("def").identifier(self.reserved).ast(self.param_list).ast(self.block)
-        self.args = rule(Argument).ast(self.expr).repeat(rule().sep(",").ast(self.expr))
-        self.postfix = rule().sep("(").maybe(self.args).sep(")")
+        self.param_list = Parser(name="param list").sep("(").maybe(self.params).sep(")")
+        self.define = rule(DefStmnt, name="define").sep("def").identifier(self.reserved).ast(self.param_list).ast(self.block)
+        self.args = rule(Argument, name="argument").ast(self.expr).repeat(rule(name="repeat expr").sep(",").ast(self.expr))
+        self.postfix = Parser(name="postfix").sep("(").maybe(self.args).sep(")")
         
         self.reserved.add(")")
         self.primary.repeat(self.postfix)
@@ -85,4 +85,4 @@ class FuncParser(BasicParser):
 class ClosureParser(FuncParser):
     def __init__(self):
         super().__init__()
-        self.primary.insert_choice(rule(Fun).sep("fun").ast(self.param_list).ast(self.block))
+        self.primary.insert_choice(rule(Fun, name="fun").sep("fun").ast(self.param_list).ast(self.block))

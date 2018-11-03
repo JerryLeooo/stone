@@ -231,12 +231,14 @@ class Factory(object):
         return factory
 
 class Parser(object):
-    def __init__(self, arg = None):
+    def __init__(self, arg = None, name=""):
         if isinstance(arg, Parser):
             self.elements = arg.elements
             self.factory = arg.factory
         else:
             self.reset(arg)
+
+        self.name = name
 
     def parse(self, lexer):
         results = []
@@ -253,8 +255,8 @@ class Parser(object):
         return e.match(lexer)
 
     @classmethod
-    def rule(cls, clazz = None):
-        return cls(clazz)
+    def rule(cls, clazz = None, name=""):
+        return cls(clazz, name)
 
     def reset(self, clazz = None):
         self.elements = []
@@ -290,7 +292,7 @@ class Parser(object):
         return self
 
     def maybe(self, parser):
-        p2 = Parser(parser)
+        p2 = Parser(parser, name=parser.name)
         p2.reset()
         self.elements.append(OrTree([parser, p2]))
         return self
@@ -309,10 +311,14 @@ class Parser(object):
 
     def insert_choice(self, parser):
         e = self.elements[0]
+        print("insert_choice", e.parsers, parser)
         if isinstance(e, OrTree):
             e.insert(parser)
         else:
-            otherwise = Parser(self)
+            otherwise = Parser(self, name=self.name)
             self.reset(None)
             self.my_or(parser, otherwise)
         return self
+
+    def __str__(self):
+        return self.name
