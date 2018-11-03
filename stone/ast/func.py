@@ -1,5 +1,7 @@
 from stone.ast.expr import ASTList
 from stone.exe.env import NestedEnv
+from stone.common.exc import StoneException
+import inspect
 
 class Postfix(ASTList):
     pass
@@ -52,3 +54,20 @@ class Fun(ASTList):
 
     def body(self):
         return self.child(1)
+
+class NativeFunction(object):
+    def __init__(self, n, m):
+        self.name = n
+        self.method = m
+        self.num_params = len(inspect.getargspec(m).args)
+
+    def num_of_parameters(self):
+        return self.num_params
+
+    def invoke(self, args, tree):
+        try:
+            return self.method(args)
+        except:
+            raise StoneException("bad native function call: %s" % self.name, tree)
+
+    

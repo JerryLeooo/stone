@@ -1,5 +1,3 @@
-import os
-
 from stone.exe.interpreter import BasicInterpreter, FuncInterpreter, ClosureInterpreter
 from . import get_source_path
 

@@ -85,7 +85,7 @@ class BasicEvaluator(object):
                 elif op == "==":
                     return left == right
                 else:
-                    raise StoneException("bad type", self)
+                    raise StoneException("bad type: %s(%s) %s %s(%s)" % (left, left.__class__, op, right, right.__class__), self)
 
         def compute_number(self, left, op, right):
             print(left, op, right)
@@ -171,21 +171,39 @@ class FuncEvaluator(object):
     @category(Argument)
     class ArgumentEx(Argument):
         def eval(self, caller_env, value):
-            if not isinstance(value, Function):
-                raise StoneException("bad function", self)
 
+            if not isinstance(value, NativeFunction):
+                if not isinstance(value, Function):
+                    raise StoneException("bad function", self)
+
+                func = value
+                params = func.parameters()
+                if self.size() != params.size():
+                    raise StoneException("bad number of arguments", self)
+
+                new_env = func.make_env()
+                num = 0
+                for a in self.children():
+                    params.eval(new_env, num, a.eval(caller_env))
+                    num += 1
+
+                return func.body().eval(new_env)
+            
             func = value
-            params = func.parameters()
-            if self.size() != params.size():
+            param_length = func.num_of_parameters()
+
+            print(self.size(), param_length)
+            if self.size() != param_length - 1:
                 raise StoneException("bad number of arguments", self)
 
-            new_env = func.make_env()
+            args = []
             num = 0
-            for a in self.children():
-                params.eval(new_env, num, a.eval(caller_env))
-                num += 1
 
-            return func.body().eval(new_env)
+            for a in self.children():
+                args.append(a.eval(caller_env))
+
+            return func.invoke(args, self)
+
 
     @category(ParameterList)
     class ParamsEx(ParameterList):
