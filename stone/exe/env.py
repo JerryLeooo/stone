@@ -11,6 +11,9 @@ class Environment(object):
     def get(self, name):
         pass
 
+    def all(self):
+        pass
+
 class BasicEnv(Environment):
     def __init__(self):
         self.values = {}
@@ -20,6 +23,9 @@ class BasicEnv(Environment):
 
     def get(self, name):
         return self.values.get(name)
+
+    def all(self):
+        return self.values
 
 class NestedEnv(Environment):
     def __init__(self, e = None):
@@ -54,5 +60,11 @@ class NestedEnv(Environment):
             return None
         else:
             return self.outer.where(name)
+
+    def all(self):
+        return {
+            "values": self.values,
+            "outer": self.outer
+        }
 
     

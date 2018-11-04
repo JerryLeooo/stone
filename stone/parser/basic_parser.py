@@ -2,6 +2,7 @@ from stone.parser.parser import Parser, Operators
 from stone.ast.expr import NumberLiteral, BinaryExpr, StringLiteral, PrimaryExpr, Name, BlockStmnt, IfStmnt, WhileStmnt, NullStmnt, NegativeExpr
 from stone.lexer.token import Token
 from stone.ast.func import ParameterList, DefStmnt, Argument, Fun
+from stone.ast.classes import ClassBody, ClassStmnt, Dot
 
 rule = Parser.rule
 
@@ -86,3 +87,13 @@ class ClosureParser(FuncParser):
     def __init__(self):
         super().__init__()
         self.primary.insert_choice(rule(Fun, name="fun").sep("fun").ast(self.param_list).ast(self.block))
+
+class ClassParser(ClosureParser):
+    def __init__(self):
+        super().__init__()
+        self.member = Parser(name="member").my_or(self.define, self.simple)
+        self.class_body = Parser(ClassBody, name="class_body").sep("{").option(self.member).repeat(Parser().sep(";", Token.EOL).option(self.member)).sep("}")
+        self.def_class = Parser(ClassStmnt, name="def_class").sep("class").identifier(self.reserved).option(Parser().sep("extends").identifier(self.reserved)).ast(self.class_body)
+        
+        self.postfix.insert_choice(Parser(Dot, name="dot").sep(".").identifier(self.reserved))
+        self.program.insert_choice(self.def_class)

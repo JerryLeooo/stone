@@ -1,5 +1,6 @@
 from stone.ast.expr import *
 from stone.ast.func import *
+from stone.ast.classes import *
 from stone.common.exc import *
 
 def category(original_cls):
@@ -69,12 +70,32 @@ class BasicEvaluator(object):
                 return self.compute_op(left, op, right)
 
         def compute_assign(self, env, rvalue):
-            l = self.left()
-            if isinstance(l, Name):
-                env.put(l.name(), rvalue)
+
+            def original_assign(env, rvalue):
+                l = self.left()
+                if isinstance(l, Name):
+                    env.put(l.name(), rvalue)
+                    return rvalue
+                else:
+                    raise StoneException("bad assignment", self)
+
+            le = self.left()
+            if isinstance(le, PrimaryExpr):
+                p = le
+                if p.has_postfix(0) and isinstance(p.postfix(0), Dot):
+                    t = le.eval_sub_expr(env, 1)
+                    if isinstance(t, StoneObject):
+                        return self.set_field(t, p.postfix(0), rvalue)
+
+            return original_assign(env, rvalue)
+
+        def set_field(self, obj, expr, rvalue):
+            name = self.expr.name()
+            try:
+                obj.write(name, rvalue)
                 return rvalue
-            else:
-                raise StoneException("bad assignment", self)
+            except Exception as e:
+                raise StoneException("bad member access %s: %s" % (self.location(), name))
 
         def compute_op(self, left, op, right):
             if isinstance(left, int) and isinstance(right, int):
@@ -156,7 +177,9 @@ class FuncEvaluator(object):
             return self.child(self.num_children() - nest - 1)
 
         def has_postfix(self, nest):
-            return self.num_children() - nest > 1
+            r = self.num_children() - nest > 1
+            print("has_postfix", r, self.num_children(), nest, list(self.children()))
+            return r
 
         def eval(self, env):
             return self.eval_sub_expr(env, 0)
@@ -199,6 +222,7 @@ class FuncEvaluator(object):
             args = []
 
             for a in self.children():
+                print("....", a, caller_env.all())
                 args.append(a.eval(caller_env))
 
             return func.invoke(args, self)
@@ -214,4 +238,37 @@ class ClosureEvaluator(object):
     class FunEx(Fun):
         def eval(self, env):
             return Function(self.parameters(), self.body(), env) 
-    
+
+class ClassEvaluator(object):
+    @category(ClassStmnt)
+    class ClassStmntEx(ClassStmnt):
+        def eval(self, env):
+            class_info = ClassInfo(self, env)
+            env.put(self.name(), class_info)
+            return self.name()
+
+    @category(ClassBody)
+    class ClassBodyEx(ClassBody):
+        def eval(self, env):
+            for t in self.children():
+                t.eval(env)
+            return None
+
+    @category(Dot)
+    class DotEx(Dot):
+        def eval(self, env, value):
+            member = self.name()
+            if isinstance(value, ClassInfo):
+                if member == "new":
+                    class_info = value
+                    e = NestedEnv(class_info.environment())
+                    so = StoneObject(e)
+                    e.put_new(class_info, e)
+                    return so
+            elif isinstance(value, StoneObject):
+                try:
+                    return value.read(member)
+                except Exception as e:
+                    print(e)
+            
+            raise StoneException("bad member access: %s" % member, self)

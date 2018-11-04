@@ -311,7 +311,6 @@ class Parser(object):
 
     def insert_choice(self, parser):
         e = self.elements[0]
-        print("insert_choice", e.parsers, parser)
         if isinstance(e, OrTree):
             e.insert(parser)
         else:

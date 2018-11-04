@@ -4,7 +4,7 @@ from stone.lexer.lexer import Lexer
 from stone.lexer.token import Token
 from stone.ast.expr import NullStmnt
 from stone.exe.evaluator import BasicEvaluator
-from stone.parser.basic_parser import BasicParser, FuncParser, ClosureParser
+from stone.parser.basic_parser import BasicParser, FuncParser, ClosureParser, ClassParser
 from stone.exe.env import NestedEnv
 from stone.exe.native import Natives
 
@@ -31,3 +31,7 @@ class ClosureInterpreter(BasicInterpreter):
 class NativeInterapreter(BasicInterpreter):
     def main(self, fp):
         self.run(ClosureParser(), Natives().environment(NestedEnv()), fp)
+
+class ClassInterpreter(BasicInterpreter):
+    def main(self, fp):
+        self.run(ClassParser(), Natives().environment(NestedEnv()), fp)
