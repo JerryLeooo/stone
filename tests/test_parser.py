@@ -16,9 +16,13 @@ def test_more_parser():
             print(ast)
 
 def test_primary():
+
     with open(get_source_path("func_call.stone"), "r") as fp:
         lexer = Lexer(fp)
         cp = FuncParser()
+
+        print(cp.primary.elements)
+
         while lexer.peek(0) != Token.EOF:
-            ast = cp.expr.parse(lexer)
+            ast = cp.parse(lexer)
             print(ast)

@@ -29,6 +29,7 @@ class OrTree(Element):
             raise ParseException(lexer.peek(0).text())
         else:
             res.append(parser.parse(lexer))
+        print(parser, lexer, res)
 
     def match(self, lexer):
         return self.choose(lexer) != None
@@ -55,6 +56,7 @@ class Repeat(Element):
                 res.append(ast_tree)
             if self.only_once:
                 break
+        print("___________", lexer, self.parser, res)
 
     def match(self, lexer):
         return self.parser.match(lexer)
