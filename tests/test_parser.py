@@ -20,5 +20,5 @@ def test_primary():
         lexer = Lexer(fp)
         cp = FuncParser()
         while lexer.peek(0) != Token.EOF:
-            ast = cp.parse(lexer)
+            ast = cp.expr.parse(lexer)
             print(ast)
