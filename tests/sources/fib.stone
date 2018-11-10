@@ -7,3 +7,8 @@ def fib( n ) {
 }
 
 fib(10)
+
+
+def f(a, b) {
+    1
+}
