@@ -80,7 +80,7 @@ class IfStmnt(ASTList):
         return self.child(0)
 
     def then_block(self):
-        return self.child(0)
+        return self.child(1)
 
     def else_block(self):
         return self.child(2) if self.num_children() > 2 else None
