@@ -20,5 +20,5 @@ c2()
 inc2 = fun() { 2 }
 
 inc2()
-inc2 2
+inc2
 

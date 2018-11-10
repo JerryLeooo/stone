@@ -56,7 +56,7 @@ class Repeat(Element):
                 res.append(ast_tree)
             if self.only_once:
                 break
-        print("___________", lexer, self.parser, res)
+        # print("___________", lexer, self.parser, res)
 
     def match(self, lexer):
         return self.parser.match(lexer)
@@ -87,6 +87,7 @@ class IdToken(AToken):
         self.reserved = r if r else set()
 
     def test(self, t):
+        print("reserved", self.reserved, t.text(), t.is_identifier())
         r = t.is_identifier() and not (t.text() in self.reserved)
         return r
 
@@ -103,9 +104,11 @@ class Leaf(Element):
         self.tokens = tokens
 
     def parse(self, lexer, res):
+        print(self.tokens)
         t = lexer.read()
         if t.is_identifier():
             for token in self.tokens:
+                print("token", token, t.text())
                 if token == t.text():
                     self.find(res, t)
                     return

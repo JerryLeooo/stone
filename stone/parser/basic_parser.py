@@ -79,9 +79,9 @@ class FuncParser(BasicParser):
         self.args = rule(Argument, name="argument").ast(self.expr).repeat(rule(name="repeat expr").sep(",").ast(self.expr))
         self.postfix = Parser(name="postfix").sep("(").maybe(self.args).sep(")")
 
-        self.primary.repeat(self.postfix)
-        self.simple.option(self.args)
-        self.program.insert_choice(self.define)
+        self.primary = self.primary.repeat(self.postfix)
+        self.simple = self.simple.option(self.args)
+        self.program = self.program.insert_choice(self.define)
 
 class ClosureParser(FuncParser):
     def __init__(self):
