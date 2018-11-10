@@ -14,6 +14,9 @@ class ASTTree(object):
     def iterator(self):
         return self.children()
 
+    def size(self):
+        return self.num_children()
+
 class ASTLeaf(ASTTree):
 
     def __init__(self, t):
@@ -63,6 +66,7 @@ class PrimaryExpr(ASTList):
     
     @classmethod
     def create(self, tree):
+        print("tree:", tree, "len(tree):", len(tree))
         return tree[0] if len(tree) == 1 else PrimaryExpr(tree)
 
 class NegativeExpr(ASTList):

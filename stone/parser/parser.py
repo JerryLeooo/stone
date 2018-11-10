@@ -220,6 +220,7 @@ class Factory(object):
             return None
 
         func = getattr(clazz, cls.factory_name, None)
+        print("????", "clazz:", clazz, "func:", func)
 
         factory = cls()
 

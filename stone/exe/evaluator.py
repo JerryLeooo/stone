@@ -6,7 +6,7 @@ from stone.common.exc import *
 def category(original_cls):
     def _(cls):
         for k, v in filter(
-            lambda item: not item[0].startswith("_") and not item[0] in original_cls.__dict__.items(), cls.__dict__.items()
+            lambda item: not item[0].startswith("_") and not item[0] in original_cls.__dict__.keys(), cls.__dict__.items()
         ):
             setattr(original_cls, k, v)
     return _
@@ -80,6 +80,7 @@ class BasicEvaluator(object):
                     raise StoneException("bad assignment", self)
 
             le = self.left()
+            print("left: ", type(le))
             if isinstance(le, PrimaryExpr):
                 p = le
                 if p.has_postfix(0) and isinstance(p.postfix(0), Dot):
@@ -109,7 +110,6 @@ class BasicEvaluator(object):
                     raise StoneException("bad type: %s(%s) %s %s(%s)" % (left, left.__class__, op, right, right.__class__), self)
 
         def compute_number(self, left, op, right):
-            print(left, op, right)
             if op == "+":
                 return left + right
             elif op == "-":
@@ -177,14 +177,13 @@ class FuncEvaluator(object):
             return self.child(self.num_children() - nest - 1)
 
         def has_postfix(self, nest):
-            r = self.num_children() - nest > 1
-            print("has_postfix", r, self.num_children(), nest, list(self.children()))
-            return r
+            return self.num_children() - nest > 1
 
         def eval(self, env):
             return self.eval_sub_expr(env, 0)
 
         def eval_sub_expr(self, env, nest):
+            print("eval_sub_expr", "env:", env, "nest:", nest)
             if self.has_postfix(nest):
                 target = self.eval_sub_expr(env, nest + 1)
                 return self.postfix(nest).eval(env, target)
@@ -215,7 +214,7 @@ class FuncEvaluator(object):
             func = value
             param_length = func.num_of_parameters()
 
-            print(self.size(), param_length)
+            print("size:", self.size(), "param_length:", param_length)
             if self.size() != param_length - 1:
                 raise StoneException("bad number of arguments", self)
 

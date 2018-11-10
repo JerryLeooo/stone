@@ -68,6 +68,7 @@ class FuncParser(BasicParser):
 
     def __init__(self):
         super().__init__()
+        self.reserved.add(")")
         self.param = Parser(name="param").identifier(self.reserved)
         self.params = rule(ParameterList, name="params").ast(self.param).repeat(
             rule(name="param??").sep(",").ast(self.param)
@@ -77,8 +78,7 @@ class FuncParser(BasicParser):
         self.define = rule(DefStmnt, name="define").sep("def").identifier(self.reserved).ast(self.param_list).ast(self.block)
         self.args = rule(Argument, name="argument").ast(self.expr).repeat(rule(name="repeat expr").sep(",").ast(self.expr))
         self.postfix = Parser(name="postfix").sep("(").maybe(self.args).sep(")")
-        
-        self.reserved.add(")")
+
         self.primary.repeat(self.postfix)
         self.simple.option(self.args)
         self.program.insert_choice(self.define)

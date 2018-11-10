@@ -19,6 +19,7 @@ class BasicInterpreter(object):
             if not isinstance(t, NullStmnt):
                 r = t.eval(env)
                 print("=> ", t, "//", r, t.__class__)
+                print()
 
 class FuncInterpreter(BasicInterpreter):
     def main(self, fp):
